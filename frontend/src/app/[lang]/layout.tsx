@@ -8,7 +8,7 @@ import Banner from "./components/Banner";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import {FALLBACK_SEO} from "@/app/[lang]/utils/constants";
-
+import {getPageBySlug} from "@/app/[lang]/utils/get-page-by-slug";
 
 async function getGlobal(lang: string): Promise<any> {
   const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
@@ -24,6 +24,7 @@ async function getGlobal(lang: string): Promise<any> {
       "favicon",
       "notificationBanner.link",
       "navbar.links",
+      "navbar.button",
       "navbar.navbarLogo.logoImg",
       "footer.footerLogo.logoImg",
       "footer.menuLinks",
@@ -43,9 +44,11 @@ export async function generateMetadata({ params } : { params: {lang: string}}): 
 
   const { metadata, favicon } = meta.data.attributes;
   const { url } = favicon.data.attributes;
-
   return {
-    title: metadata.metaTitle,
+    title: {
+      template: `%s | ${metadata.metaTitle}`,
+      default: 'Главная | ИДПО ГАУГН',
+    },
     description: metadata.metaDescription,
     icons: {
       icon: [new URL(url, getStrapiURL())],
@@ -79,11 +82,12 @@ export default async function RootLayout({
       <body>
         <Navbar
           links={navbar.links}
+          button={navbar.button}
           logoUrl={navbarLogoUrl}
           logoText={navbar.navbarLogo.logoText}
         />
 
-        <main className="dark:bg-black dark:text-gray-100 min-h-screen">
+        <main className="bg-white min-h-screen">
           {children}
         </main>
 
